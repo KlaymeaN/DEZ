@@ -1,2 +1,2 @@
 # DEZ
-D bot is a personal project of mine in which I'm trying to practive my programming skills for learning purposes.
+D bot , is a bot which I created to expand my programming knowledge by trying to make a discord bot. This is for educational purposes and you should never use it! 
