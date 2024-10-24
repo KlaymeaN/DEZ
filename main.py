@@ -3,14 +3,14 @@ from discord.ext import commands
 import yt_dlp as ytdlp  
 import json
 import re
+import os
 
 
 
-# Configure intents
 intents = discord.Intents.default()
 intents.members = True
 intents.voice_states = True  # Required for voice channel features
-intents.messages = True  # Required to read message content
+intents.messages = True  #  read message 
 intents.message_content = True
 
 
@@ -18,7 +18,7 @@ intents.message_content = True
 # Set up the bot and command prefix
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Create a global variable to store the current voice client and queue
+# store the current voice client and queue
 music_queue = []
 
 
@@ -26,7 +26,7 @@ music_queue = []
 
 
 def is_url(input_str):
-    # Simple regex to check if the input is a URL
+    #  if the input is a URL
     url_regex = re.compile(r'^(https?://)?(www\.)?(youtube\.com|youtu\.?be)/.+$')
     return bool(url_regex.match(input_str))
 
@@ -41,7 +41,7 @@ def is_url(input_str):
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
-# Command to join the voice channel
+# join 
 @bot.command()
 async def join(ctx):
     if ctx.author.voice:
@@ -51,7 +51,7 @@ async def join(ctx):
     else:
         await ctx.send("Koskhol aval bayad tu channel bashi")
 
-# Command to leave the voice channel
+# leave 
 @bot.command()
 async def leave(ctx):
     if ctx.voice_client:
@@ -60,7 +60,7 @@ async def leave(ctx):
     else:
         await ctx.send("Tu voice channel nistam ahmaq")
 
-# Command to play audio from YouTube (streaming only)
+# play audio from YouTube (streaming only)
 @bot.command()
 async def play(ctx, * , query: str):
     if not ctx.voice_client:  # If the bot isn't in a voice channel
@@ -80,24 +80,25 @@ async def play(ctx, * , query: str):
 
     # yt-dlp download options (streaming only)
          ydl_opts = {
-            'format': 'bestaudio/best',  # Best quality audio
-            'noplaylist': True,          # Only process single video, not playlists
+            'format': 'bestaudio/best',  # Best quality 
+            'noplaylist': True,          #  not playlists
             'quiet': True  ,              # Suppress yt-dlp output logs
+            #'cookies': 'cookies.txt',
             'default_search': 'ytsearch1', 
           }
          await ctx.send(f"Bezar bebinam in gohi ke migi hast ya na")
 
          try:
              ydl = ytdlp.YoutubeDL(ydl_opts)
-             info = ydl.extract_info(query, download=False)  # Extract video info without downloading
+             info = ydl.extract_info(query, download=False)  # Extract video info 
             
-            # Check if the result has entries (for search results)
+            # (for search results)
              if 'entries' in info:
-                stream_url = info['entries'][0]['url']  # Get the URL of the first search result
-                title = info['entries'][0]['title']  # Get the video title
+                stream_url = info['entries'][0]['url']  #  URL of the first search result
+                title = info['entries'][0]['title']  #  video title
              else:
                 stream_url = info['url']  # If it's a direct URL
-                title = info['title']  # Get the video title
+                title = info['title']  #video title
 
          except Exception as e:
             await ctx.send(f"Error extracting information: {str(e)}")
@@ -109,6 +110,7 @@ async def play(ctx, * , query: str):
         ydl_opts = {
                 'format' : 'bestaudio/best',
                 'noplaylist' : True ,
+                #'cookies': 'cookies.txt',
                 'quiet' : True,
             }
         try:
@@ -126,15 +128,15 @@ async def play(ctx, * , query: str):
         await ctx.send(f"Be queue add shod arbAb: {title}")
         return 
 
-        # Play audio using FFmpeg
+        # Play audio
     vc = ctx.voice_client
     vc.play(discord.FFmpegPCMAudio(stream_url), after=lambda e: print(f'Ahanget tamum shod Obi {title}'))
 
-        # Create an embed with buttons
+        #  buttons
     embed = discord.Embed(title=f'Khafe sho o goosh kon be: {title}', color=discord.Color.blue())
     embed.set_footer(text='Age nemidoni in button ha chi mikonan vaqean gaavi')
 
-        # Create buttons
+        #buttons
     play_button = discord.ui.Button(label="Play", style=discord.ButtonStyle.primary)
     pause_button = discord.ui.Button(label="Pause", style=discord.ButtonStyle.secondary)
     skip_button = discord.ui.Button(label="Skip to next", style=discord.ButtonStyle.success)
@@ -163,16 +165,16 @@ async def play(ctx, * , query: str):
     pause_button.callback = pause_callback
     skip_button.callback = skip_callback
 
-        # Create the view and add buttons
+    # buttons
     view = discord.ui.View()
     view.add_item(play_button)
     view.add_item(pause_button)
     view.add_item(skip_button)
 
-        # Send the message with buttons
+     # buttons
     await ctx.send(embed=embed, view=view)
 
-# Command to stop playback
+#  stop playback
 @bot.command()
 async def stop(ctx):
     if ctx.voice_client:
@@ -181,9 +183,16 @@ async def stop(ctx):
     else:
         await ctx.send("Tu channel nistam ke oksol")
 
-# Load the bot token from a config file
-with open('config.json', 'r') as f:
-    config = json.load(f)
-TOKEN = config['TOKEN']
 
-bot.run(TOKEN)
+#with open('config.json', 'r') as f:
+ #   config = json.load(f)
+#TOKEN = config['TOKEN']
+
+
+TOKEN = os.getenv("TOKEN")
+
+if TOKEN is None:
+    print("Error: DISCORD_TOKEN environment variable not set.")
+else:
+   
+    bot.run(TOKEN)
