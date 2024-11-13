@@ -1,3 +1,4 @@
 denv
 config.json
 fly.toml
+Dockerfile
