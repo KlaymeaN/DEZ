@@ -2,3 +2,4 @@ denv
 config.json
 fly.toml
 Dockerfile
+playlists.json
